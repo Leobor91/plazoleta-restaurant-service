@@ -6,16 +6,4 @@ public class PersonalizedBadRequestException extends RuntimeException{
         super(message);
     }
 
-    public PersonalizedBadRequestException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public PersonalizedBadRequestException() {
-        super();
-    }
-
-    public PersonalizedBadRequestException(Throwable cause) {
-        super(cause);
-    }
-
 }

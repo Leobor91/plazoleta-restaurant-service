@@ -175,10 +175,6 @@ class RestaurantTest {
     @Test
     @DisplayName("Should return correct string representation with toString()")
     void toString_ShouldReturnCorrectString() {
-        String expectedToStringSubstring = "Restaurant(id=" + id + ", name=" + name + ", nit=" + nit +
-                ", address=" + address + ", phoneNumber=" + phoneNumber +
-                ", urlLogo=" + urlLogo + ", ownerId=" + ownerId +
-                ", ownerName=null)";
 
         assertTrue(restaurant.toString().contains("id=" + id));
         assertTrue(restaurant.toString().contains("name=" + name));

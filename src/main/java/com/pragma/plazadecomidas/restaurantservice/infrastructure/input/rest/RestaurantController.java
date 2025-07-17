@@ -37,7 +37,7 @@ public class RestaurantController {
                             schema = @Schema(implementation = RestaurantResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "Solicitud inválida o datos faltantes/incorrectos",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ExceptionResponse.class), // Muestra tu ExceptionResponse
+                            schema = @Schema(implementation = ExceptionResponse.class),
                             examples = {
                                     @io.swagger.v3.oas.annotations.media.ExampleObject(
                                             name = "Error de Validación - Nombre Requerido",
@@ -92,7 +92,7 @@ public class RestaurantController {
                             })),
             @ApiResponse(responseCode = "404", description = "Propietario no encontrado",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ExceptionResponse.class), // Muestra tu ExceptionResponse
+                            schema = @Schema(implementation = ExceptionResponse.class),
                             examples = {
                                     @io.swagger.v3.oas.annotations.media.ExampleObject(
                                             name = "Error - Propietario No Encontrado",

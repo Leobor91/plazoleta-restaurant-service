@@ -8,7 +8,6 @@ import com.pragma.plazadecomidas.restaurantservice.domain.exception.Personalized
 import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedException;
 import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedNotFoundException;
 import com.pragma.plazadecomidas.restaurantservice.domain.model.MessageEnum;
-import com.pragma.plazadecomidas.restaurantservice.domain.spi.IAuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,8 +46,7 @@ class RestaurantControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
-    private IAuthService authService;
+
 
     private RestaurantRequestDto validRequestDto;
     private RestaurantResponseDto successResponseDto;

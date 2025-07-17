@@ -6,15 +6,4 @@ public class PersonalizedNotFoundException extends RuntimeException{
         super(message);
     }
 
-    public PersonalizedNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public PersonalizedNotFoundException() {
-        super();
-    }
-
-    public PersonalizedNotFoundException(Throwable cause) {
-        super(cause);
-    }
 }

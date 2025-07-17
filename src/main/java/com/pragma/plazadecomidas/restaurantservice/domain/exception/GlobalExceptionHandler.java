@@ -21,19 +21,28 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({
-            PersonalizedException.class
-    })
-    public ResponseEntity<ExceptionResponse> handleCustomExceptions(RuntimeException ex) {
-        ExceptionResponse response = new ExceptionResponse(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         ExceptionResponse response = new ExceptionResponse(ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
+    @ExceptionHandler(PersonalizedException.class)
+    public ResponseEntity<ExceptionResponse> handleCustomExceptions(RuntimeException ex) {
+        ExceptionResponse response = new ExceptionResponse(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(PersonalizedNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleNotFoundException(PersonalizedNotFoundException ex) {
+        ExceptionResponse response = new ExceptionResponse(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(PersonalizedBadRequestException.class)
+    public ResponseEntity<ExceptionResponse> handleBadRequestException(PersonalizedBadRequestException ex) {
+        ExceptionResponse response = new ExceptionResponse(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
 
 }

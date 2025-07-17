@@ -8,16 +8,4 @@ public class PersonalizedException extends RuntimeException {
         super(message);
     }
 
-    public PersonalizedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public PersonalizedException() {
-        super();
-    }
-
-    public PersonalizedException(Throwable cause) {
-        super(cause);
-    }
-
 }

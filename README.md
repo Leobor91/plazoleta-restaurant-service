@@ -38,6 +38,16 @@ Para levantar el servicio en tu entorno local, sigue estos pasos:
 * **MySQL Server** (versión 8.0 o superior recomendada)
 * **Servicio de Autenticación (AuthService):** Este servicio depende del `auth-service` para la validación de usuarios propietarios. Asegúrate de tenerlo levantado y accesible.
 
+
+```bash
+
+
+git clone https://github.com/Leobor91/plazoleta-restaurant-service.git
+
+
+cd auth-service
+```
+
 ### **Configuración de la Base de Datos**
 
 1.  Al levantar el servicio este crea ( `db_restaurant_db`) automaticamente 
@@ -84,7 +94,63 @@ Para levantar el servicio en tu entorno local, sigue estos pasos:
     ./gradlew bootRun
     ```
 
-    El servicio debería iniciarse en `http://localhost:8082` (o el puerto configurado en `application.yml`).
+    La aplicación se iniciará por defecto en `http://localhost:8082` (o el puerto configurado en `application.yml`).
+
+#  ⚙️ Configuración y Rutas Clave
+
+### puertos
+* **Puerto de la Aplicación:** 8082 (configulable en `application.yml`)
+
+---
+
+## Endpoints de API REST
+
+Todos los endpoints están prefijados con `/api/v1/restaurants`.
+
+---
+
+### Registro de Restaurante
+
+`POST /api/v1/restaurants/create-restaurant`
+
+Crea un nuevo restaurante con usuario de **PROPIETARIO** asignado.
+
+**Cuerpo de la Solicitud (JSON):**
+
+```json
+{
+  "nombre": "Restaurante 123",
+  "nit": "90081234",
+  "direccion": "Calle 123 #4-56",
+  "Celular": "+5730012345",
+  "url_del_logo": "http://example.com/logo.png",
+  "id_propietario": "3"
+}
+```
+---
+
+### Respuestas Comunes para Registro:
+
+* **`201 Created`**: El restaurante fue creado exitosamente.
+* **`400 Bad Request`**: Los datos enviados no son válidos (ej. formato incorrecto, campos obligatorios faltantes).
+* **`404 Not Found`**: no se encontro algun recurso.
+* **`409 Conflict`**: Se presentó un conflicto de datos; esto puede ocurrir si el nombre, Nit ya están registrados, o el usuario asignado no tiene el rol Propietario.
+* **`403 Forbidden`**: No tienes los permisos necesarios para realizar esta acción, posiblemente debido a restricciones de seguridad que impiden la creación del rol solicitado.
+* **`500 Internal Server Error`**: Ocurrió un error inesperado en el servidor durante el procesamiento de la solicitud.
+
+---
+
+### Gestión de Excepciones
+
+Las excepciones personalizadas (```PersonalizedException```, ```PersonalizedBadRequestException```, ```PersonalizedNotFoundException```) lanzadas por la lógica de negocio son capturadas por un
+```@ControllerAdvice``` y mapeadas a respuestas HTTP ```409 Conflict```, ```400 Bad Request```, ```404 Not Foundt```
+, con un cuerpo JSON que contiene el mensaje de error.
+
+* Ubicación del ControllerAdvice:
+  ```com.pragma.plazadecomidas.restaurantservice.domain.exception.GlobalExceptionHandler.java```
+
+
+---
 
 ## 📚 Documentación API (Swagger UI)
 
@@ -123,30 +189,30 @@ Este reporte te mostrará el porcentaje de líneas, ramas e instrucciones de tu 
 
 ---
 
-### Umbrales de Cobertura (Opcional)
-
-Hemos configurado jacoco en tu build.gradle para generar los reportes de cobertura.
-
 ```gradle
-tasks.jacocoTestReport {
-	dependsOn test
+
+jacoco {
+	toolVersion = "0.8.11"
+}
+
+def coverageExcludes = [
+		'**/dto/.*',
+		'**/spi/.*',
+		'**/api/.*',
+		'**/mappers/.*',
+		'**/repository/.*',
+		'**/*.test',
+		'**/generated/.*',
+]
+
+jacocoTestReport {
 	reports {
 		xml.required = true
-		csv.required = false
 		html.required = true
 	}
-
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
-			fileTree(dir: it,
-					exclude: [
-							'com/pragma/plazadecomidas/authservice/AuthServiceApplication.class',
-							'**/infrastructure/configuration/**',
-							'**/application/dto/**',
-							'**/infrastructure/exception/**',
-							'**/domain/model/**',
-							'**/infrastructure/out/jpa/entity/**'
-						])
+			fileTree(dir: it, exclude: coverageExcludes)
 		}))
 	}
 }

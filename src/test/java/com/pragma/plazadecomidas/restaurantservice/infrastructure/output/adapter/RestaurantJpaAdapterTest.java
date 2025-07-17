@@ -18,9 +18,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.stereotype.Service;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,12 +28,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
                 RestaurantJpaAdapter.class,
                 IRestaurantEntityMapper.class
         }),
-        // Excluir estas clases por su tipo específico para evitar la carga de sus dependencias no JPA
+
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 BeanConfiguration.class,
                 RestaurantHandlerImpl.class,
                 RestaurantServicePortImpl.class,
-                AuthServiceImpl.class // ¡Ahora con el nombre de clase correcto!
+                AuthServiceImpl.class
         })
 )
 @ActiveProfiles("test")

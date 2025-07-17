@@ -8,6 +8,8 @@ import com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.rep
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
@@ -22,5 +24,17 @@ public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
                         restaurantEntityMapper.toRestaurantEntity(restaurant)
                 )
         );
+    }
+
+    @Override
+    public Optional<Restaurant> findByName(String name) {
+        return restaurantRepository.findByName(name)
+                .map(restaurantEntityMapper::toRestaurant);
+    }
+
+    @Override
+    public Optional<Restaurant> findByNit(String nit) {
+        return restaurantRepository.findByNit(nit)
+                .map(restaurantEntityMapper::toRestaurant);
     }
 }

@@ -2,12 +2,14 @@ package com.pragma.plazadecomidas.restaurantservice.infrastructure.input.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pragma.plazadecomidas.restaurantservice.application.dto.request.RestaurantRequestDto;
+import com.pragma.plazadecomidas.restaurantservice.application.dto.response.RestaurantResponseDto;
+import com.pragma.plazadecomidas.restaurantservice.application.handler.IRestaurantHandler;
+import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedBadRequestException;
+import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedException;
+import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedNotFoundException;
 import com.pragma.plazadecomidas.restaurantservice.domain.model.MessageEnum;
-import com.pragma.plazadecomidas.restaurantservice.domain.model.Restaurant;
-import com.pragma.plazadecomidas.restaurantservice.domain.model.User;
 import com.pragma.plazadecomidas.restaurantservice.domain.spi.IAuthService;
-import com.pragma.plazadecomidas.restaurantservice.domain.spi.IRestaurantPersistencePort;
-import com.pragma.plazadecomidas.restaurantservice.domain.util.ValidationUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-
-import java.time.LocalDate;
-import java.util.Optional;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,116 +41,346 @@ class RestaurantControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @MockBean
+    private IRestaurantHandler restaurantHandler;
+
     @Autowired
     private ObjectMapper objectMapper;
-
-    @MockBean(name = "restaurantPersistencePort")
-    private IRestaurantPersistencePort restaurantPersistencePort;
 
     @MockBean
     private IAuthService authService;
 
-    @MockBean
-    private ValidationUtils validationUtils;
+    private RestaurantRequestDto validRequestDto;
+    private RestaurantResponseDto successResponseDto;
 
+    private static final String BASE_URL = "/api/v1/restaurants";
+    private static final String CREATE_RESTAURANT_URL = BASE_URL + "/create-restaurant";
 
-    @Test
-    @DisplayName("Should return 201 Created when a valid restaurant request is made and owner is valid")
-    void createRestaurant_ValidRequest_ReturnsCreated() throws Exception {
-        RestaurantRequestDto requestDto = new RestaurantRequestDto(
-                "Mi Nuevo Restaurante", "123456789", "Calle Falsa 123", "3001234567", "http://logo.com/new.png", 1L
+    @BeforeEach
+    void setUp() {
+        validRequestDto = new RestaurantRequestDto(
+                "Mi Restaurante",
+                "123456789",
+                "Calle Falsa 123",
+                "3101234567",
+                "http://logo.com/logo.png",
+                1L
         );
-        Restaurant savedRestaurant = new Restaurant(
-                1L, requestDto.getName(), requestDto.getNit(), requestDto.getAddress(),
-                requestDto.getPhoneNumber(), requestDto.getUrlLogo(), requestDto.getOwnerId(), ""
-        );
 
-        User mockUser = new User(
+        successResponseDto = new RestaurantResponseDto(
                 1L,
-                "Juan",
-                "Perez",
-                "juan@mail.com",
-                "3001234567",
-                "12345678",
-                "password",
-                LocalDate.of(1990, 1, 1),
-                "1",
-                "PROPIETARIO"
+                "Mi Restaurante",
+                "123456789",
+                "Calle Falsa 123",
+                "3101234567",
+                "http://logo.com/logo.png",
+                "Owner Name"
         );
-
-        when(authService.findById(1L)).thenReturn(Optional.of(mockUser));
-
-        when(validationUtils.isValid("Mi Nuevo Restaurante")).thenReturn(true);
-        when(validationUtils.isValid("123456789")).thenReturn(true);
-        when(validationUtils.isValid("Calle Falsa 123")).thenReturn(true);
-        when(validationUtils.isValid("3001234567")).thenReturn(true);
-        when(validationUtils.isValid("http://logo.com/new.png")).thenReturn(true);
-        when(validationUtils.isValid("1")).thenReturn(true);
-        when(validationUtils.containsOnlyNumbers("123456789")).thenReturn(true);
-        when(validationUtils.isValidPhoneStructure("3001234567")).thenReturn(true);
-        when(validationUtils.isValidUrl("http://logo.com/new.png")).thenReturn(true);
-        when(validationUtils.isValidNameStructure("Mi Nuevo Restaurante")).thenReturn(true);
-        when(validationUtils.isValidateRole("PROPIETARIO", "PROPIETARIO")).thenReturn(true);
-
-        when(restaurantPersistencePort.save(any(Restaurant.class))).thenReturn(savedRestaurant);
-
-        mockMvc.perform(post("/api/v1/restaurants/create-restaurant")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("Mi Nuevo Restaurante"));
     }
 
     @Test
-    @DisplayName("Should return 409 Conflict for invalid phone number format due to service validation")
-    void createRestaurant_InvalidPhoneNumberFormat_ReturnsBadRequest() throws Exception {
-        RestaurantRequestDto requestDto = new RestaurantRequestDto(
-                "Otro Restaurante", "987654321", "Carrera 45", "ABCDEFG", "http://logo.com/otro.png", 2L
-        );
+    @DisplayName("Should return 201 Created and the saved restaurant details when valid request is provided")
+    void saveRestaurant_ValidRequest_ReturnsCreatedAndRestaurant() throws Exception {
+        // Given
+        when(restaurantHandler.saveRestaurant(any(RestaurantRequestDto.class))).thenReturn(successResponseDto);
 
-        when(authService.findById(2L)).thenReturn(
-                java.util.Optional.of(
-                        new com.pragma.plazadecomidas.restaurantservice.domain.model.User(
-                                2L, "Nombre", "Apellido", "mail@mail.com", "3000000000", "12345678", "password",
-                                java.time.LocalDate.of(1990, 1, 1), "1", "PROPIETARIO"
-                        )
-                )
-        );
-
-
-        when(validationUtils.isValid("Otro Restaurante")).thenReturn(true);
-        when(validationUtils.isValid("987654321")).thenReturn(true);
-        when(validationUtils.isValid("Carrera 45")).thenReturn(true);
-        when(validationUtils.isValid("ABCDEFG")).thenReturn(true);
-        when(validationUtils.isValid("http://logo.com/otro.png")).thenReturn(true);
-        when(validationUtils.isValid("2")).thenReturn(true);
-        when(validationUtils.containsOnlyNumbers("987654321")).thenReturn(true);
-        when(validationUtils.isValidUrl("http://logo.com/otro.png")).thenReturn(true);
-        when(validationUtils.isValidNameStructure("Otro Restaurante")).thenReturn(true);
-        when(validationUtils.isValidateRole("PROPIETARIO", "PROPIETARIO")).thenReturn(true);
-        when(validationUtils.isValidPhoneStructure("ABCDEFG")).thenReturn(false);
-
-        mockMvc.perform(post("/api/v1/restaurants/create-restaurant")
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(successResponseDto.getId()))
+                .andExpect(jsonPath("$.name").value(successResponseDto.getName()))
+                .andExpect(jsonPath("$.nit").value(successResponseDto.getNit()))
+                .andExpect(jsonPath("$.ownerName").value(successResponseDto.getOwnerName()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when name is missing ")
+    void saveRestaurant_MissingName_ReturnsBadRequest() throws Exception {
+        // Given
+        RestaurantRequestDto invalidRequestDto = new RestaurantRequestDto(
+                null,
+                "123456789",
+                "Calle Falsa 123",
+                "3101234567",
+                "http://logo.com/logo.png",
+                1L
+        );
+
+        doThrow(new PersonalizedBadRequestException(MessageEnum.NAME_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").isNotEmpty());
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when NIT is missing")
+    void saveRestaurant_MissingNit_ReturnsBadRequest() throws Exception {
+        // Given
+        RestaurantRequestDto invalidRequestDto = new RestaurantRequestDto(
+                "Test Name",
+                null,
+                "Calle Falsa 123",
+                "3101234567",
+                "http://logo.com/logo.png",
+                1L
+        );
+
+        doThrow(new PersonalizedBadRequestException(MessageEnum.NIT_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").isNotEmpty());
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when ownerId is missing ")
+    void saveRestaurant_MissingOwnerId_ReturnsBadRequest() throws Exception {
+        // Given
+        RestaurantRequestDto invalidRequestDto = new RestaurantRequestDto(
+                "Test Name",
+                "12345",
+                "Calle Falsa 123",
+                "3101234567",
+                "http://logo.com/logo.png",
+                null
+        );
+
+        doThrow(new PersonalizedBadRequestException(MessageEnum.OWNER_ID_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").isNotEmpty());
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for NAME_REQUIRED")
+    void saveRestaurant_HandlerThrowsNameRequiredException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.NAME_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.NAME_REQUIRED.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for NIT_REQUIRED")
+    void saveRestaurant_HandlerThrowsNitRequiredException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.NIT_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.NIT_REQUIRED.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for ADDRESS_REQUIRED")
+    void saveRestaurant_HandlerThrowsAddressRequiredException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.ADDRESS_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.ADDRESS_REQUIRED.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for PHONE_REQUIRED")
+    void saveRestaurant_HandlerThrowsPhoneRequiredException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.PHONE_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.PHONE_REQUIRED.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for URL_REQUIRED")
+    void saveRestaurant_HandlerThrowsUrlRequiredException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.URL_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.URL_REQUIRED.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for OWNER_ID_REQUIRED")
+    void saveRestaurant_HandlerThrowsOwnerIdRequiredException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.OWNER_ID_REQUIRED.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.OWNER_ID_REQUIRED.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for NIT_FORMAT")
+    void saveRestaurant_HandlerThrowsNitFormatException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.NIT_FORMAT.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.NIT_FORMAT.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for PHONE_FORMAT")
+    void saveRestaurant_HandlerThrowsPhoneFormatException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.PHONE_FORMAT.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.mensaje").value(MessageEnum.PHONE_FORMAT.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
     }
 
     @Test
-    @DisplayName("Should return 403 Forbidden when ownerId does not correspond to an OWNER role")
-    void createRestaurant_OwnerNotOwner_ReturnsForbidden() throws Exception {
-        RestaurantRequestDto requestDto = new RestaurantRequestDto(
-                "Restaurante Prohibido", "444555666", "Avenida Siempre Viva", "3006665544", "http://logo.com/prohibido.png", 4L
-        );
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for NAME_FORMAT")
+    void saveRestaurant_HandlerThrowsNameFormatException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.NAME_FORMAT.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
 
-
-
-        mockMvc.perform(post("/api/v1/restaurants/")
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(status().isForbidden());
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.NAME_FORMAT.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 409 Conflict when handler throws PersonalizedException for OWNER_NOT_PROPRIETARIO")
+    void saveRestaurant_HandlerThrowsOwnerNotProprietarioException_ReturnsConflict() throws Exception {
+        // Given
+        doThrow(new PersonalizedException(MessageEnum.OWNER_NOT_PROPRIETARIO.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.OWNER_NOT_PROPRIETARIO.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 404 Not Found when handler throws PersonalizedException for OWNER_NOT_FOUND")
+    void saveRestaurant_HandlerThrowsOwnerNotFoundException_ReturnsNotFound() throws Exception {
+        // Given
+        doThrow(new PersonalizedNotFoundException(MessageEnum.OWNER_NOT_FOUND.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.OWNER_NOT_FOUND.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request when handler throws PersonalizedException for RESTAURANT_REQUEST_NULL")
+    void saveRestaurant_HandlerThrowsRequestNull_ReturnsBadRequest() throws Exception {
+        // Given
+        doThrow(new PersonalizedBadRequestException(MessageEnum.RESTAURANT_REQUEST_NULL.getMessage()))
+                .when(restaurantHandler).saveRestaurant(any(RestaurantRequestDto.class));
+
+        // When & Then
+        mockMvc.perform(post(CREATE_RESTAURANT_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.mensaje").value(MessageEnum.RESTAURANT_REQUEST_NULL.getMessage()));
+
+        verify(restaurantHandler, times(1)).saveRestaurant(any(RestaurantRequestDto.class));
     }
 
 }

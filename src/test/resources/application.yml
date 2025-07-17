@@ -12,3 +12,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         format_sql: true
+
+  auth:
+    service:
+      host: http://localhost:8081
+      url: /api/v1/users/isOwner

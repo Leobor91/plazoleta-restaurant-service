@@ -31,12 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
                 RestaurantJpaAdapter.class,
                 IRestaurantEntityMapper.class
         }),
-        // Excluir estas clases por su tipo específico para evitar la carga de sus dependencias no JPA
+
         excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 BeanConfiguration.class,
                 RestaurantHandlerImpl.class,
                 RestaurantServicePortImpl.class,
-                AuthServiceImpl.class // ¡Ahora con el nombre de clase correcto!
+                AuthServiceImpl.class
         })
 )
 @ActiveProfiles("test")

@@ -1,4 +1,4 @@
-package com.pragma.plazadecomidas.restaurantservice.config;
+package com.pragma.plazadecomidas.restaurantservice.infrastructure.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

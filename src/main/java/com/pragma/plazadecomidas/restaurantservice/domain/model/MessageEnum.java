@@ -21,7 +21,9 @@ public enum MessageEnum {
     ERROR_5XX("Error interno en Auth Service"),
     PROPIETARIO("PROPIETARIO"),
     OWNER_NOT_PROPRIETARIO("El usuario no tiene el rol PROPRIETARIO"),
-    USER_NOT_FOUND("El usuario no fue encontrado"),
+    OWNER_NOT_FOUND("Propietario no encontrado"),
+    RESTAURANT_NAME_EXISTS("El restaurante con nombre '%s' ya existe."),
+    RESTAURANT_NIT_EXISTS("El NIT del restaurante ya esta registrado."),
     EMPTY(" ");
 
     private final String message;

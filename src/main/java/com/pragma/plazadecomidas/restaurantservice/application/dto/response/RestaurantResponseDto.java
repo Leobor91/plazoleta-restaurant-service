@@ -19,6 +19,9 @@ public class RestaurantResponseDto {
     @Schema(description = "Nombre del restaurante", example = "Mi Restaurante")
     private String name;
 
+    @Schema(description = "NIT del restaurante", example = "900123456")
+    private String nit;
+
     @Schema(description = "Dirección física del restaurante", example = "Calle 123 #4-56")
     private String address;
 

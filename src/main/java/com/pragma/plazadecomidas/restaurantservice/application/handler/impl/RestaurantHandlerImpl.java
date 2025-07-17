@@ -6,6 +6,7 @@ import com.pragma.plazadecomidas.restaurantservice.application.handler.IRestaura
 import com.pragma.plazadecomidas.restaurantservice.application.mapper.IRestaurantRequestMapper;
 import com.pragma.plazadecomidas.restaurantservice.application.mapper.IRestaurantResponseMapper;
 import com.pragma.plazadecomidas.restaurantservice.domain.api.IRestaurantServicePort;
+import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedBadRequestException;
 import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedException;
 import com.pragma.plazadecomidas.restaurantservice.domain.model.MessageEnum;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,6 @@ public class RestaurantHandlerImpl implements IRestaurantHandler {
                 .map(restaurantRequestMapper::toRestaurant)
                 .map(restaurantServicePort::saveRestaurant)
                 .map(restaurantResponseMapper::toResponseDto)
-                .orElseThrow(() -> new PersonalizedException(MessageEnum.RESTAURANT_REQUEST_NULL.getMessage()));
+                .orElseThrow(() -> new PersonalizedBadRequestException(MessageEnum.RESTAURANT_REQUEST_NULL.getMessage()));
     }
 }

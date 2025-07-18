@@ -195,7 +195,6 @@ class IRestaurantRepositoryTest {
 
     @Test
     @DisplayName("Should throw DataIntegrityViolationException when saving restaurant with duplicate NIT")
-    @SuppressWarnings("SonarLint")
     void save_DuplicateNit_ShouldThrowException() {
         // Given
         entityManager.persistAndFlush(restaurantEntity1); // Persistir el primero

@@ -145,7 +145,6 @@ class RestaurantEntityTest {
 
     @Test
     @DisplayName("Equals should return false for null object")
-    @SuppressWarnings("SonarLint")
     void equals_NullObject_ReturnFalse() {
         RestaurantEntity entity1 = createBaseEntity();
         assertNotEquals(null, entity1);

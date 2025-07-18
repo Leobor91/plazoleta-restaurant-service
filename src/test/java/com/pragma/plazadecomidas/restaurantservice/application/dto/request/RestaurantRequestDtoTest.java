@@ -142,7 +142,6 @@ class RestaurantRequestDtoTest {
 
     @Test
     @DisplayName("Equals and HashCode should work correctly for same objects")
-    @SuppressWarnings("SonarLint")
     void equalsAndHashCode_SameObjects_ReturnTrue() {
         // GIVEN
         RestaurantRequestDto dto1 = createBaseDto();

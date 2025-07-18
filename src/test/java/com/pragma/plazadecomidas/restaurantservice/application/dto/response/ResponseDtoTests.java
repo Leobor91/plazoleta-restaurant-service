@@ -110,7 +110,6 @@ class ResponseDtoTests {
 
     @Test
     @DisplayName("UserResponseDto: Equals and HashCode should work correctly for same objects")
-    @SuppressWarnings("SonarLint")
     void userResponseDto_EqualsAndHashCode_SameObjects_ReturnTrue() {
         UserResponseDto dto1 = createUserResponseDtoBase();
         UserResponseDto dto2 = createUserResponseDtoBase();
@@ -260,7 +259,6 @@ class ResponseDtoTests {
 
     @Test
     @DisplayName("RestaurantResponseDto: Equals and HashCode should work correctly for same objects")
-    @SuppressWarnings("SonarLint")
     void restaurantResponseDto_EqualsAndHashCode_SameObjects_ReturnTrue() {
         RestaurantResponseDto dto1 = createRestaurantResponseDtoBase();
         RestaurantResponseDto dto2 = createRestaurantResponseDtoBase();

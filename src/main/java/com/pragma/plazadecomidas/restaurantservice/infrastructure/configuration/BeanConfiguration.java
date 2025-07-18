@@ -1,7 +1,7 @@
 package com.pragma.plazadecomidas.restaurantservice.infrastructure.configuration;
 
 
-import com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.adapter.AuthServiceImpl;
+import com.pragma.plazadecomidas.restaurantservice.infrastructure.out.jpa.adapter.AuthServiceImpl;
 import com.pragma.plazadecomidas.restaurantservice.domain.spi.IAuthService;
 import com.pragma.plazadecomidas.restaurantservice.application.mapper.IUserResponseMapper;
 import org.springframework.context.annotation.Bean;

@@ -7,7 +7,7 @@ import com.pragma.plazadecomidas.restaurantservice.application.mapper.IRestauran
 import com.pragma.plazadecomidas.restaurantservice.application.mapper.IRestaurantResponseMapper;
 import com.pragma.plazadecomidas.restaurantservice.domain.api.IRestaurantServicePort;
 import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedBadRequestException;
-import com.pragma.plazadecomidas.restaurantservice.domain.exception.PersonalizedException;
+
 import com.pragma.plazadecomidas.restaurantservice.domain.model.MessageEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

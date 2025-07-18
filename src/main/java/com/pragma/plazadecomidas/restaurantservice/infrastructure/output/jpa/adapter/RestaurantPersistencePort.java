@@ -1,4 +1,4 @@
-package com.pragma.plazadecomidas.restaurantservice.infrastructure.output.adapter;
+package com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.adapter;
 
 
 import com.pragma.plazadecomidas.restaurantservice.domain.model.Restaurant;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class RestaurantJpaAdapter implements IRestaurantPersistencePort {
+public class RestaurantPersistencePort implements IRestaurantPersistencePort {
 
     private final IRestaurantRepository restaurantRepository;
     private final IRestaurantEntityMapper restaurantEntityMapper;

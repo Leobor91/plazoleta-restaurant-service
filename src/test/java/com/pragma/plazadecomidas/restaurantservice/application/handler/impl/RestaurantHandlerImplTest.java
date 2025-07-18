@@ -120,7 +120,7 @@ class RestaurantHandlerImplTest {
         assertEquals(MessageEnum.RESTAURANT_REQUEST_NULL.getMessage(), exception.getMessage());
 
         // Verify
-        verify(restaurantServicePort, times(0)).saveRestaurant(any());;
+        verify(restaurantServicePort, times(0)).saveRestaurant(any());
     }
 
     @Test

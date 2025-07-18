@@ -1,4 +1,4 @@
-package com.pragma.plazadecomidas.restaurantservice.infrastructure.output.adapter;
+package com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.adapter;
 
 import com.pragma.plazadecomidas.restaurantservice.application.dto.response.UserResponseDto;
 import com.pragma.plazadecomidas.restaurantservice.application.mapper.IUserResponseMapper;

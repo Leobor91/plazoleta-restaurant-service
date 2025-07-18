@@ -43,6 +43,7 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'com.h2database:h2'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
 }
 
 jacoco {
@@ -75,6 +76,7 @@ tasks.withType(JavaCompile) {
 	options.compilerArgs << "-Xlint:deprecation"
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport
 }

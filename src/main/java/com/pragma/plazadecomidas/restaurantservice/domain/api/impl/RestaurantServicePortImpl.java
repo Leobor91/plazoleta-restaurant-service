@@ -29,27 +29,27 @@ public class RestaurantServicePortImpl implements IRestaurantServicePort {
     @Override
     public Restaurant saveRestaurant(Restaurant restaurant) {
 
-        if (!validationUtils.isValid(restaurant.getName())) {
+        if (!validationUtils.isValidName(restaurant.getName())) {
             throw new PersonalizedBadRequestException(MessageEnum.NAME_REQUIRED.getMessage());
         }
 
-        if (!validationUtils.isValid(restaurant.getNit())) {
+        if (!validationUtils.isValidNit(restaurant.getNit())) {
             throw new PersonalizedBadRequestException(MessageEnum.NIT_REQUIRED.getMessage());
         }
 
-        if (!validationUtils.isValid(restaurant.getAddress())) {
+        if (!validationUtils.isValidAdress(restaurant.getAddress())) {
             throw new PersonalizedBadRequestException(MessageEnum.ADDRESS_REQUIRED.getMessage());
         }
 
-        if (!validationUtils.isValid(restaurant.getPhoneNumber())) {
+        if (!validationUtils.isValidPhoneNumber(restaurant.getPhoneNumber())) {
             throw new PersonalizedBadRequestException(MessageEnum.PHONE_REQUIRED.getMessage());
         }
 
-        if (!validationUtils.isValid(restaurant.getUrlLogo())) {
-            throw new PersonalizedBadRequestException(MessageEnum.URL_REQUIRED.getMessage());
+        if (!validationUtils.isValidUrl(restaurant.getUrlLogo())) {
+            throw new PersonalizedBadRequestException(MessageEnum.URL_FORMAT.getMessage());
         }
 
-        if (!validationUtils.isValid(String.valueOf(restaurant.getOwnerId()))) {
+        if (!validationUtils.isValidOwnerId(String.valueOf(restaurant.getOwnerId()))) {
             throw new PersonalizedBadRequestException(MessageEnum.OWNER_ID_REQUIRED.getMessage());
         }
 
@@ -59,10 +59,6 @@ public class RestaurantServicePortImpl implements IRestaurantServicePort {
 
         if (!validationUtils.isValidPhoneStructure(restaurant.getPhoneNumber())) {
             throw new PersonalizedBadRequestException(MessageEnum.PHONE_FORMAT.getMessage());
-        }
-
-        if (!validationUtils.isValidUrl(restaurant.getUrlLogo())) {
-            throw new PersonalizedBadRequestException(MessageEnum.URL_FORMAT.getMessage());
         }
 
         if (!validationUtils.isValidNameStructure(restaurant.getName())) {

@@ -1,7 +1,6 @@
-package com.pragma.plazadecomidas.restaurantservice.infrastructure.out.jpa.repository;
+package com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.repository;
 
 import com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.entity.RestaurantEntity;
-import com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.repository.IRestaurantRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -196,6 +195,7 @@ class IRestaurantRepositoryTest {
 
     @Test
     @DisplayName("Should throw DataIntegrityViolationException when saving restaurant with duplicate NIT")
+    @SuppressWarnings("SonarLint")
     void save_DuplicateNit_ShouldThrowException() {
         // Given
         entityManager.persistAndFlush(restaurantEntity1); // Persistir el primero

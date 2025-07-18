@@ -1,7 +1,6 @@
 package com.pragma.plazadecomidas.restaurantservice.infrastructure.out.jpa.repository;
 
-import com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.entity.RestaurantEntity;
-import com.pragma.plazadecomidas.restaurantservice.infrastructure.output.jpa.repository.IRestaurantRepository;
+import com.pragma.plazadecomidas.restaurantservice.infrastructure.out.jpa.entity.RestaurantEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

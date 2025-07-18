@@ -3,7 +3,7 @@ package com.pragma.plazadecomidas.restaurantservice.infrastructure.input.rest;
 import com.pragma.plazadecomidas.restaurantservice.application.dto.request.RestaurantRequestDto;
 import com.pragma.plazadecomidas.restaurantservice.application.dto.response.RestaurantResponseDto;
 import com.pragma.plazadecomidas.restaurantservice.application.handler.IRestaurantHandler;
-import com.pragma.plazadecomidas.restaurantservice.domain.exception.ExceptionResponse;
+import com.pragma.plazadecomidas.restaurantservice.infrastructure.exception.ExceptionResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

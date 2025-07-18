@@ -33,7 +33,6 @@ public class RestaurantServiceApplication {
 		log.info("Max memory: {}", format.format(maxMemory / mb) + mega);
 		log.info("Total free memory: {}", format.format((freeMemory + (maxMemory - allocatedMemory)) / mb) + mega);
 		log.info("=================================================================");
-		log.info("");
 
 	}
 

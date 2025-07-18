@@ -147,7 +147,7 @@ Las excepciones personalizadas (```PersonalizedException```, ```PersonalizedBadR
 , con un cuerpo JSON que contiene el mensaje de error.
 
 * Ubicación del ControllerAdvice:
-  ```com.pragma.plazadecomidas.restaurantservice.domain.exception.GlobalExceptionHandler.java```
+  ```com.pragma.plazadecomidas.restaurantservice.infrastructure.exception.GlobalExceptionHandler.java```
 
 
 ---

@@ -4,7 +4,6 @@ package com.pragma.plazadecomidas.restaurantservice.domain.util;
 import com.pragma.plazadecomidas.restaurantservice.domain.model.MessageEnum;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.regex.Matcher;
 
 @Component
@@ -33,9 +32,7 @@ public class ValidationUtils {
     }
 
     public boolean isValidUrl(String url){
-        if (url == null) return false;
-        Matcher matcher = java.util.regex.Pattern.compile(MessageEnum.URL_STRUCTURE.getMessage()).matcher(url);
-        return matcher.matches();
+        return isValid(url);
     }
 
     public boolean isValidateRole(String userRole, String roleName){
@@ -43,4 +40,23 @@ public class ValidationUtils {
         return userRole.equalsIgnoreCase(roleName);
     }
 
+    public boolean isValidName(String name) {
+        return isValid(name);
+    }
+
+    public boolean isValidNit(String nit) {
+        return isValid(nit);
+    }
+
+    public boolean isValidAdress(String address) {
+        return isValid(address);
+    }
+
+    public boolean isValidPhoneNumber(String phoneNumber) {
+        return isValid(phoneNumber);
+    }
+
+    public boolean isValidOwnerId(String ownerId) {
+        return isValid(ownerId);
+    }
 }

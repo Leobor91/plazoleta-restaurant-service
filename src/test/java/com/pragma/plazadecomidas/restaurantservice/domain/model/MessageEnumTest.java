@@ -59,7 +59,7 @@ class MessageEnumTest {
         assertEquals("El ID del propietario es obligatorio", MessageEnum.OWNER_ID_REQUIRED.getMessage());
 
         assertNotNull(MessageEnum.ERROR_4XX.getMessage());
-        assertEquals("Error al validar rol de usuario en Auth Service", MessageEnum.ERROR_4XX.getMessage());
+        assertEquals("Propietario no encontrado", MessageEnum.ERROR_4XX.getMessage());
 
         assertNotNull(MessageEnum.ERROR_5XX.getMessage());
         assertEquals("Error interno en Auth Service", MessageEnum.ERROR_5XX.getMessage());

@@ -196,11 +196,11 @@ jacoco {
 }
 
 def coverageExcludes = [
-		'**/dto/.*',
-		'**/spi/.*',
-		'**/api/.*',
-		'**/mappers/.*',
-		'**/repository/.*',
+		'**/dto/**',
+		'**/spi/**',
+		'**/api/**',
+		'**/mappers/**',
+		'**/repository/**',
 		'**/*.test',
 		'**/generated/.*',
 ]

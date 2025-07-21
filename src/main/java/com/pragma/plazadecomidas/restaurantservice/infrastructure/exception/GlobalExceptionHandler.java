@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        String errorMessage = "Error de validación en la solicitud."; // Mensaje por defecto
+        String errorMessage = "Error de validación en la solicitud.";
         FieldError fieldError = ex.getBindingResult().getFieldError();
         if (fieldError != null) {
             errorMessage = fieldError.getDefaultMessage();
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         ExceptionResponse response = new ExceptionResponse(ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(WebClientRequestException.class)
@@ -61,27 +61,28 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        ExceptionResponse response = new ExceptionResponse("Solicitud con JSON mal formado o datos ilegibles.");
+        ExceptionResponse response = new ExceptionResponse("Solicitud con JSON mal formado o datos ilegibles. " +
+                "Verifique la sintaxis y tipos de datos."); // Mensaje un poco más descriptivo
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(UnexpectedTypeException.class)
     public ResponseEntity<ExceptionResponse> handleUnexpectedTypeException(UnexpectedTypeException ex) {
-        ExceptionResponse response = new ExceptionResponse("Tipo de dato inesperado en la solicitud.");
+        ExceptionResponse response = new ExceptionResponse("Tipo de dato inesperado en la solicitud. " +
+                "Asegúrese de que los valores coincidan con los tipos esperados.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    // Cambiado para devolver ExceptionResponse y eliminar @ResponseStatus redundante
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ExceptionResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
-        ExceptionResponse errorResponse = new ExceptionResponse(String.format("Parámetro '%s' es requerido", ex.getParameterName()));
+        ExceptionResponse errorResponse = new ExceptionResponse(String.format("Parámetro de consulta '%s' es requerido.", ex.getParameterName()));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     // Manejador genérico para cualquier otra excepción no capturada
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleGenericException(Exception ex) {
-        ExceptionResponse response = new ExceptionResponse("Error interno del servidor inesperado.");
+        ExceptionResponse response = new ExceptionResponse("Error interno del servidor inesperado. Por favor, contacte a soporte.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
